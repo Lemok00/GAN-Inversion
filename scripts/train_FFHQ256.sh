@@ -1,14 +1,7 @@
-#!/bin/bash
-#SBATCH -o ../logs/211020_FFHQ256.out
-#SBATCH -J FFHQ256
-#SBATCH -N 1
-#SBATCH --gres=gpu:4
-#SBATCH --ntasks-per-node=4
-#SBATCH --nodelist=node07
-
-
-nvidia-smi
-
 cd ../train
 
-python train_restyle_encoder_0805.py --name AfhqCat256
+python train_Restyle.py \
+--name FFHQ256 \
+--dataset_path ../../dataset/FFHQ/prepared_train_256 \
+--dataset_type resized_lmdb \
+--batch_size 3

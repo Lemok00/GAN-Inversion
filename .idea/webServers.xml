@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="544b137a-d11e-47f7-bfd5-ea6ee590dda0" name="a208" url="http:///">
+        <fileTransfer rootFolder="/home/a208/MZP/ReStyle" accessType="SFTP" host="219.223.207.133" port="22" sshConfigId="2dfdfcce-d4cd-4644-8505-80e5af33af90" sshConfig="a208_XN">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="97d87230-e6be-448f-8c93-3820ac62ff9b" name="a220" url="http:///">
+        <fileTransfer rootFolder="/home/ding/Mzp/ReStyle" accessType="SFTP" host="1.14.157.234" port="32000" sshConfigId="8e8e0923-387b-4d78-9e69-7ed0faa0afc8" sshConfig="a220">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

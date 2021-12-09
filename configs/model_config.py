@@ -17,8 +17,4 @@ pretrained_information = {
         'path': '../pretrained_models/church_stylegan2.pkl',
         'size': 256
     },
-    'AfhqCat256': {
-        'path': '../pretrained_models/afhqcat.pkl',
-        'size': 512
-    }
 }

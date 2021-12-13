@@ -59,7 +59,7 @@ class ResNet152_StyleEncoder(nn.Module):
         for i in range(n_styles):
             if i < self.mid_start:
                 style = Map2StyleBlock(2048, 512, self.input_size / 16)
-            elif i < self.mid_start:
+            elif i < self.fine_start:
                 style = Map2StyleBlock(2048, 512, self.input_size / 8)
             else:
                 style = Map2StyleBlock(2048, 512, self.input_size / 4)

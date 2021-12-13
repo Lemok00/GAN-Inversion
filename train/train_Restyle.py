@@ -1,10 +1,9 @@
 import torch
-from torch import nn
 from torch.optim import Adam
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
-import pickle
 from torchvision import utils, transforms
+from torchsummary import summary
 
 from argparse import ArgumentParser
 import math
@@ -51,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('--train_ratio', type=float, default=0.8,
                         help='Ratio of training data.')
 
-    parser.add_argument('--encoder', type=str, choices=['resnet152'], default='resnet152',
+    parser.add_argument('--encoder', type=str, choices=['resnet152','poolformer'], default='resnet152',
                         help='The encoder for encoding images into W+ latent codes (resnet152).')
     parser.add_argument('--lambda_e', type=float, default=1,
                         help='Weight of the reconstruction loss.')
@@ -100,6 +99,7 @@ if __name__ == '__main__':
     # Initialize pretrained Encoder
     print(f'Loading pretrained Encoder ...')
     encoder = encoder_list[args.encoder](in_channel=6, size=image_size, n_styles=n_styles).to(device)
+    summary(encoder, input_size=(6, 256, 256), batch_size=-1)
     encoder.train()
     print(f'Pretrained Encoder loaded.\n')
 
@@ -146,10 +146,8 @@ if __name__ == '__main__':
 
             this_batch_size = real_image.shape[0]
             if not this_batch_size == args.batch_size:
-                recovered_image = generator.synthesis(average_style, noise_mode='none') \
-                    .repeat(this_batch_size, 1, 1, 1).detach()
-            else:
-                recovered_image = average_image
+                continue
+            recovered_image = average_image
             recovered_style = average_style.repeat(args.batch_size, 1, 1)
 
             recovered_images = []

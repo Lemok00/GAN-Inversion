@@ -10,7 +10,7 @@
         </fileTransfer>
       </webServer>
       <webServer id="97d87230-e6be-448f-8c93-3820ac62ff9b" name="a220" url="http:///">
-        <fileTransfer rootFolder="/home/ding/Mzp/ReStyle" accessType="SFTP" host="1.14.157.234" port="32000" sshConfigId="8e8e0923-387b-4d78-9e69-7ed0faa0afc8" sshConfig="a220">
+        <fileTransfer rootFolder="/home/ding/Mzp/ReStyle" accessType="SFTP" host="219.223.198.248" port="22" sshConfigId="3fc4f03e-1551-41ff-9e39-aa7c3ffa20b3" sshConfig="a220_XN">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>

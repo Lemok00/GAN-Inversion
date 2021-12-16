@@ -61,7 +61,7 @@ if __name__ == '__main__':
                         help='Print logs every \'log_iter\' iters.')
     parser.add_argument('--output_iter', type=int, default=500,
                         help='Output images every \'output_iter\' iters.')
-    parser.add_argument('--save_epoch', type=int, default=10,
+    parser.add_argument('--save_epoch', type=int, default=2,
                         help='Save models every \'save_epoch\' epochs.')
     parser.add_argument('--device', type=str, default='cuda')
 

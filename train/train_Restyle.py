@@ -50,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('--train_ratio', type=float, default=0.8,
                         help='Ratio of training data.')
 
-    parser.add_argument('--encoder', type=str, choices=['resnet152','poolformer'], default='resnet152',
+    parser.add_argument('--encoder', type=str, choices=['resnet34', 'resnet152', 'poolformer'], default='resnet152',
                         help='The encoder for encoding images into W+ latent codes (resnet152).')
     parser.add_argument('--lambda_e', type=float, default=1,
                         help='Weight of the reconstruction loss.')

@@ -5,4 +5,4 @@ python train_Restyle.py \
 --dataset_path ../../dataset/FFHQ/prepared_train_256 \
 --dataset_type resized_lmdb \
 --batch_size 3 \
---encoder resnet34
+--encoder poolformer

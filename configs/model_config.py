@@ -3,10 +3,12 @@ import sys
 sys.path.append('.')
 sys.path.append('..')
 from models.encoders.resnet152 import ResNet152_StyleEncoder
+from models.encoders.resnet34 import ResNet34_StyleEncoder
 from models.encoders.poolformer import PoolFormer_StyleEncoder
 
 encoder_list = {
     'resnet152': ResNet152_StyleEncoder,
+    'resnet34': ResNet34_StyleEncoder,
     'poolformer': PoolFormer_StyleEncoder
 }
 

@@ -38,8 +38,6 @@ if __name__ == '__main__':
 
     parser.add_argument('--n_steps', type=int, default=3,
                         help='Steps in a iteration.')
-    parser.add_argument('--batch_size', type=int, default=2,
-                        help='Batch size.')
     parser.add_argument('--train_ratio', type=float, default=0.98,
                         help='Ratio of training data.')
     parser.add_argument('--ckpt', type=int, default=4,
@@ -56,7 +54,7 @@ if __name__ == '__main__':
 
     base_dir = f"../experiments/{args.encoder}_{args.name}_steps{args.n_steps}"
     ckpt_dir = f'{base_dir}/ckpt'
-    result_dir = f'{base_dir}/result'
+    result_dir = f'{base_dir}/mix_result'
 
     os.makedirs(result_dir, exist_ok=True)
 
@@ -100,9 +98,9 @@ if __name__ == '__main__':
     #                             image_size, False, args.train_ratio)
     test_dataset = set_dataset(args.dataset_type, args.dataset_path, transform,
                                image_size, True, args.train_ratio)
-
+    batch_size = 8
     # train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     print('Datasets Loaded.\n')
 
     calculate_lpips_loss = LPIPS(net_type='vgg').to(device)
@@ -111,7 +109,7 @@ if __name__ == '__main__':
     w_avg = generator.mapping.w_avg
     # print(w_avg.shape) #(512)
     average_style = w_avg.repeat(n_styles, 1).unsqueeze(0)
-    average_image = generator.synthesis(average_style, noise_mode='none').repeat(args.batch_size, 1, 1, 1).detach()
+    average_image = generator.synthesis(average_style, noise_mode='none').repeat(batch_size, 1, 1, 1).detach()
 
     # utils.save_image(average_image, f'{base_dir}/average_image.png', range=(-1, 1), normalize=True)
 
@@ -121,17 +119,17 @@ if __name__ == '__main__':
     start_time = time.time()
 
     total_nums = 0
-    mse_loss_sum = 0
-    lpips_loss_sum = 0
 
     for iter_idx, real_image in tqdm(enumerate(test_loader), ascii=True, total=len(test_loader)):
         real_image = real_image.to(device)
+        if total_nums > 100:
+            break
 
         this_batch_size = real_image.shape[0]
-        if not this_batch_size == args.batch_size:
+        if not this_batch_size == batch_size:
             continue
         recovered_image = average_image
-        recovered_style = average_style.repeat(args.batch_size, 1, 1)
+        recovered_style = average_style.repeat(batch_size, 1, 1)
 
         total_nums += this_batch_size
 
@@ -145,21 +143,30 @@ if __name__ == '__main__':
                 if total_nums < 100:
                     recovered_images.append(recovered_image)
 
-        # Reconstruction Loss
-        recon_loss = F.mse_loss(recovered_image, real_image)
-        # LPIPS Loss
-        lpips_loss = calculate_lpips_loss(recovered_image, real_image)
+            recovered_style_1, recovered_style_2 = torch.chunk(recovered_style, chunks=2, dim=0)
+            real_image_1, real_image_2 = torch.chunk(real_image, chunks=2, dim=0)
 
-        mse_loss_sum += recon_loss.item()
-        lpips_loss_sum += lpips_loss.item()
+            mixing_style = torch.zeros(size=(recovered_style_1.shape[0] * recovered_style_2.shape[0],
+                                             recovered_style_1.shape[1], recovered_style_1.shape[2]),
+                                       device=recovered_style_1.device)
 
-        if total_nums < 100:
-            saving_image = torch.cat(recovered_images, dim=-1)
-            for i in range(saving_image.shape[0]):
-                utils.save_image(saving_image[i],
-                                 f'{result_dir}/{iter_idx * this_batch_size + i:06d}.png',
-                                 normalize=True,
-                                 range=(-1, 1))
+            for i in range(recovered_style_1.shape[0]):
+                for j in range(recovered_style_2.shape[0]):
+                    mixing_style[i * recovered_style_2.shape[0] + j, :n_styles // 2] = \
+                        recovered_style_1[i, :n_styles // 2]
+                    mixing_style[i * recovered_style_2.shape[0] + j, n_styles // 2:] = \
+                        recovered_style_2[j, n_styles // 2:]
 
-    print(f'L2 Loss: {mse_loss_sum / (total_nums // args.batch_size)}')
-    print(f'LPIPS Loss: {lpips_loss_sum / (total_nums // args.batch_size)}')
+            mixing_image = generator.synthesis(mixing_style)
+
+            row_1 = torch.cat([torch.ones_like(real_image[0]).unsqueeze(0), real_image_2], dim=0)
+            row_2 = torch.cat([real_image_1[0].unsqueeze(0), mixing_image[0:4]], dim=0)
+            row_3 = torch.cat([real_image_1[1].unsqueeze(0), mixing_image[4:8]], dim=0)
+            row_4 = torch.cat([real_image_1[2].unsqueeze(0), mixing_image[8:12]], dim=0)
+            row_5 = torch.cat([real_image_1[3].unsqueeze(0), mixing_image[12:16]], dim=0)
+
+            saving_image = torch.cat([row_1, row_2, row_3, row_4, row_5], dim=-2)
+            utils.save_image(saving_image,
+                             f'{result_dir}/{iter_idx:06d}.png',
+                             normalize=True,
+                             range=(-1, 1))

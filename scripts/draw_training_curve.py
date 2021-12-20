@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-exp_name = 'resnet152_FFHQ256_steps3'
+exp_name = 'resnet34_FFHQ256_steps3'
 
 training_log_path = f'../experiments/{exp_name}/training_logs.txt'
 
